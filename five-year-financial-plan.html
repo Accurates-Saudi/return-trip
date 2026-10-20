@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five-Year Financial Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --ink:#101828; --text:#475467; --muted:#98a2b3; --hair:#eaecf0;
+  --impl:#f59f00; --sub:#7048e8; --mp:#1c7ed6;
+  --gain:#2b9a66; --loss:#e5484d;
+  --c1:#1c7ed6; --c2:#7048e8; --c3:#f59f00; --c4:#12b886;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#eef0f4;color:var(--text);font-family:Manrope,system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+.stage{position:fixed;inset:0;display:grid;place-items:center}
+.deck{width:1280px;height:720px;position:relative;transform-origin:center}
+.slide{position:absolute;inset:0;background:var(--paper);padding:0 72px;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .35s ease}
+.slide.active{opacity:1;pointer-events:auto}
+.hdr{height:68px;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:10px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hdr b{color:var(--mp);margin-right:10px}
+.body{flex:1;display:flex;flex-direction:column;padding-top:18px;min-height:0}
+.ftr{height:44px;display:flex;align-items:center;justify-content:flex-end;font-size:11px;font-weight:600;color:var(--muted)}
+h1{font-weight:800;font-size:62px;line-height:1.02;letter-spacing:-.03em;color:var(--ink)}
+h2{font-weight:800;font-size:36px;line-height:1.12;letter-spacing:-.02em;color:var(--ink);max-width:1040px}
+h2 em{font-style:normal;color:var(--mp)}
+.label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.big{font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:.42em;color:var(--muted);margin-left:4px;letter-spacing:0}
+.gain{color:var(--gain)!important}.loss{color:var(--loss)!important}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:0}
+.row{display:flex;gap:48px}
+svg text{font-family:Manrope,sans-serif}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:left;padding:0 12px 12px 0;border-bottom:2px solid var(--ink)}
+td{padding:13px 12px 13px 0;border-bottom:1px solid var(--hair);font-weight:600;color:var(--ink)}
+.r{text-align:right;font-variant-numeric:tabular-nums}
+tr.tot td{border-bottom:none;border-top:2px solid var(--ink);font-weight:800}
+.cover{padding:0;flex-direction:row}
+.cover .l{flex:1.1;padding:64px 72px;display:flex;flex-direction:column}
+.cover .r{flex:1;background:linear-gradient(160deg,#1c3f8a,#101828 70%);color:#fff;padding:64px 56px;display:flex;flex-direction:column;justify-content:flex-end}
+.cover .r .label{color:#9fb2d6}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:6px 0;margin-right:22px;color:var(--ink)}
+.tag::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:2px;opacity:.5}
+.nav{position:fixed;bottom:14px;right:20px;display:flex;align-items:center;gap:2px;z-index:5;font-size:12px;font-weight:700;color:var(--muted)}
+.nav span{padding:0 10px;font-variant-numeric:tabular-nums}
+.nav button{background:none;border:none;width:32px;height:30px;cursor:pointer;color:var(--ink);display:grid;place-items:center;opacity:.55}
+.nav button:hover{opacity:1}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--impl),var(--sub),var(--mp));transition:width .35s;z-index:5}
+:fullscreen .nav{opacity:0;transition:opacity .3s}:fullscreen .nav:hover{opacity:1}
+
+/* entrance animations, replayed each time a slide opens */
+@keyframes up{from{opacity:0;transform:translateY(16px)}}
+@keyframes fade{from{opacity:0}}
+@keyframes growY{from{transform:scaleY(0)}}
+@keyframes growX{from{transform:scaleX(0)}}
+@keyframes pop{from{opacity:0;transform:scale(0)}}
+.anim :is(h1,h2,.big,.label,p,.tag,table tr){animation:up .6s cubic-bezier(.2,.7,.2,1) both}
+.anim svg rect{transform-box:fill-box;transform-origin:50% 100%;animation:growY .75s cubic-bezier(.2,.7,.2,1) both}
+.anim svg rect.neg{transform-origin:50% 0}
+.anim #mixChart rect{transform-origin:0 50%;animation-name:growX}
+.anim svg text{animation:fade .5s ease both}
+.anim svg :is(polyline,path){animation:fade .8s ease both}
+.anim svg circle{transform-box:fill-box;transform-origin:center;animation:pop .45s cubic-bezier(.3,1.5,.5,1) both}
+.anim .stackY>div{transform-origin:bottom;animation:growY .6s cubic-bezier(.2,.7,.2,1) both}
+.anim td div[style*="height:16px"]{transform-origin:left;animation:growX .7s cubic-bezier(.2,.7,.2,1) both}
+.anim td div[style*="4px 0 0 4px"]{transform-origin:right}
+#risks>div{opacity:1}.anim #risks>div{animation:up .55s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){.anim *{animation:none!important}}
+@media print{
+  html,body{overflow:visible;background:#fff}.stage{position:static;display:block}.deck{transform:none!important;height:auto}
+  .slide{position:relative;opacity:1;page-break-after:always;height:720px}.nav,.bar{display:none}
+  @page{size:1280px 720px;margin:0}
+}
+.deckLink{position:fixed;bottom:14px;left:20px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;background:#fff;border:1px solid #e4e7ec;color:#16182d;font:600 12px Manrope,Outfit,system-ui,sans-serif;text-decoration:none;opacity:.75}
+.deckLink:hover{opacity:1}
+:fullscreen .deckLink{opacity:0}:fullscreen .deckLink:hover{opacity:1}
+@media print{.deckLink{display:none}}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="stage"><div class="deck" id="deck">
+
+<!-- Cover -->
+<section class="slide cover">
+  <div class="l" style="align-items:center;justify-content:center;text-align:center">
+    <div class="label" style="color:var(--mp)">Financial plan &middot; Years 1 to 5</div>
+    <h1 style="margin-top:22px">Five-Year Financial Plan</h1>
+    <p style="font-size:20px;font-weight:600;margin-top:18px;color:var(--text)">TMS, subscriptions and a freight marketplace</p>
+    <div class="row" style="margin-top:64px;gap:72px;justify-content:center">
+      <div><div class="big" style="font-size:44px;color:var(--mp)">20.3M</div><div class="label" style="margin-top:8px">5-yr revenue</div></div>
+      <div><div class="big" style="font-size:44px;color:var(--gain)">6.9M</div><div class="label" style="margin-top:8px">5-yr profit</div></div>
+      <div><div class="big" style="font-size:44px;color:var(--sub)">7.26M</div><div class="label" style="margin-top:8px">Funding</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Business model -->
+<section class="slide" data-sec="Business model">
+  <div class="body">
+    <h2>How we make money</h2>
+    <div class="row" style="margin-top:48px;gap:0">
+      <div style="flex:1;padding-right:40px">
+        <div class="label" style="color:var(--impl)">01 &middot; Implementation</div>
+        <div class="big" style="font-size:64px;margin-top:16px;color:var(--impl)">40K</div>
+        <div style="font-weight:700;margin-top:10px;color:var(--ink)">SAR one-time, per customer</div>
+      </div>
+      <div style="flex:1;padding-right:40px">
+        <div class="label" style="color:var(--sub)">02 &middot; Subscription</div>
+        <div class="big" style="font-size:64px;margin-top:16px;color:var(--sub)">1,000</div>
+        <div style="font-weight:700;margin-top:10px;color:var(--ink)">SAR per customer, monthly</div>
+      </div>
+      <div style="flex:1">
+        <div class="label" style="color:var(--mp)">03 &middot; Marketplace</div>
+        <div class="big" style="font-size:64px;margin-top:16px;color:var(--mp)">3%</div>
+        <div style="font-weight:700;margin-top:10px;color:var(--ink)">commission per completed trip</div>
+      </div>
+    </div>
+    <div style="margin-top:auto;padding-bottom:10px">
+      <div class="label" style="margin-bottom:16px">What one marketplace customer brings in</div>
+      <svg id="eqChart" viewBox="0 0 1136 120" style="width:100%"></svg>
+    </div>
+  </div>
+</section>
+
+<!-- Journey -->
+<section class="slide" data-sec="Overview">
+  <div class="body">
+    <h2>We turn a profit in <em>Year 3</em></h2>
+    <svg id="journey" viewBox="0 0 1136 470" style="width:100%;margin-top:14px;flex:1"></svg>
+  </div>
+</section>
+
+<!-- Revenue -->
+<section class="slide" data-sec="Revenue">
+  <div class="body">
+    <h2>Revenue grows <em>9x</em>, mostly from the marketplace</h2>
+    <div style="display:flex;gap:26px;margin-top:16px;font-size:13px;font-weight:700;color:var(--ink)">
+      <span><i class="dot" style="background:var(--impl)"></i>Implementation</span><span><i class="dot" style="background:var(--sub)"></i>Subscription</span><span><i class="dot" style="background:var(--mp)"></i>Marketplace</span><span style="color:var(--loss)"><i class="dot" style="background:var(--loss)"></i>Expenses</span>
+    </div>
+    <svg id="revChart" viewBox="0 0 1136 440" style="width:100%;flex:1;margin-top:6px"></svg>
+  </div>
+</section>
+
+<!-- Expenses -->
+<section class="slide" data-sec="Costs">
+  <div class="body">
+    <h2>Costs stay around <em>2.8M</em> a year, then drop</h2>
+    <div style="display:flex;gap:44px;margin-top:22px;flex:1;min-height:0">
+      <svg id="expChart" viewBox="0 0 720 440" style="width:62%"></svg>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center" id="expLegend"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Profit -->
+<section class="slide" data-sec="Profitability">
+  <div class="body">
+    <h2>Losses end in <em>Year 3</em>, and are paid back in Year 4</h2>
+    <svg id="plChart" viewBox="0 0 1136 470" style="width:100%;margin-top:14px;flex:1"></svg>
+  </div>
+</section>
+
+<!-- Customers -->
+<section class="slide" data-sec="Customers">
+  <div class="body">
+    <h2>We reach <em>100</em> TMS and <em>1,000</em> marketplace customers</h2>
+    <div class="row" style="margin-top:30px;flex:1">
+      <div style="flex:1"><div class="label" style="color:var(--sub)">TMS customers</div><svg id="tmsChart" viewBox="0 0 520 340" style="width:100%"></svg></div>
+      <div style="flex:1"><div class="label" style="color:var(--mp)">Marketplace customers</div><svg id="mpChart" viewBox="0 0 520 340" style="width:100%"></svg></div>
+    </div>
+  </div>
+</section>
+
+<div id="yearSlot"></div>
+
+<!-- Investment -->
+<section class="slide" data-sec="Funding">
+  <div class="body">
+    <h2>We need <em>SAR 7.26M</em> to start</h2>
+    <svg id="wfChart" viewBox="0 0 1136 470" style="width:100%;margin-top:14px;flex:1"></svg>
+  </div>
+</section>
+
+<!-- Risks -->
+<section class="slide" data-sec="Risks">
+  <div class="body">
+    <h2>What could go wrong</h2>
+    <div id="risks" style="display:grid;grid-template-columns:repeat(3,1fr);gap:52px 48px;margin-top:56px"></div>
+  </div>
+</section>
+
+<!-- Summary -->
+<section class="slide" data-sec="Summary">
+  <div class="body">
+    <h2>Five years in one table</h2>
+    <table style="margin-top:34px">
+      <thead><tr><th>Year</th><th class="r">Revenue</th><th class="r">Expenses</th><th style="width:300px;text-align:center">Operating result</th><th class="r">Margin</th></tr></thead>
+      <tbody id="sumBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Close -->
+<section class="slide" style="color:var(--ink);padding:72px 80px;justify-content:center;align-items:center;text-align:center">
+  <div style="font-size:88px;font-weight:800;letter-spacing:-.03em;line-height:1">Thank you</div>
+  <div style="width:64px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--impl),var(--sub),var(--mp));margin:36px 0 52px"></div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:36px">
+    <div><div class="label" style="color:var(--muted)">Invest</div><div class="big" style="font-size:56px;color:var(--sub);margin-top:12px">7.26M</div><div style="font-weight:700;color:var(--muted);margin-top:10px">SAR, covers two years</div></div>
+    <svg viewBox="0 0 40 24" style="width:40px;stroke:#d0d5dd;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M2 12h34M26 3l10 9-10 9"/></svg>
+    <div><div class="label" style="color:var(--muted)">First profit</div><div class="big" style="font-size:56px;color:var(--impl);margin-top:12px">Year 3</div><div style="font-weight:700;color:var(--muted);margin-top:10px">SAR 1.25M profit</div></div>
+    <svg viewBox="0 0 40 24" style="width:40px;stroke:#d0d5dd;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M2 12h34M26 3l10 9-10 9"/></svg>
+    <div><div class="label" style="color:var(--muted)">Total profit</div><div class="big" style="font-size:56px;color:var(--gain);margin-top:12px">6.92M</div><div style="font-weight:700;color:var(--muted);margin-top:10px">SAR, total over 5 years</div></div>
+  </div>
+  <p style="position:absolute;left:80px;right:80px;bottom:40px;font-size:11.5px;line-height:1.6;color:var(--muted);text-align:center">Preliminary projections for planning and investment discussion, not a guarantee of results. Operating profit is before tax/zakat, financing, depreciation and amortization. The funding figure is not a valuation.</p>
+</section>
+
+</div></div>
+
+<a class="deckLink" href="index.html">&larr; Business plan</a>
+<div class="nav">
+  <button id="prevBtn" aria-label="Previous slide"><svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg></button>
+  <span id="count"></span>
+  <button id="nextBtn" aria-label="Next slide"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></button>
+  <button id="fsBtn" aria-label="Full screen" title="Full screen (F)" style="margin-left:8px"><svg viewBox="0 0 16 16" id="fsIcon"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button>
+</div>
+
+<script>
+const C={impl:'#f59f00',sub:'#7048e8',mp:'#1c7ed6',ink:'#101828',text:'#475467',muted:'#98a2b3',hair:'#eaecf0',gain:'#2b9a66',loss:'#e5484d'};
+const PH=['#e5484d','#f59f00','#2b9a66','#1c7ed6','#7048e8'];
+const years=[
+ {n:1,title:'Launch',exp:2757980,impl:400000,sub:60000,mp:247500,newT:10,cumT:10,newM:100,cumM:100,cost:[2152480, 87500, 48000, 120000, 110000, 120000, 84000, 36000, 0],goals:['Launch TMS and marketplace','Hire the team','Sign first customers'],
+  ex:{people:2239980,mkt:350000,tech:84000,ops:84000}},
+ {n:2,title:'Win customers',exp:2832980,impl:800000,sub:240000,mp:1035000,newT:20,cumT:30,newM:200,cumM:300,cost:[2152480, 162500, 48000, 120000, 110000, 120000, 84000, 36000, 0],goals:['Sign more customers','Onboard faster','Keep customers longer'],
+  ex:{people:2314980,mkt:350000,tech:84000,ops:84000}},
+ {n:3,title:'First profit',exp:2856000,impl:1200000,sub:540000,mp:2362500,newT:30,cumT:60,newM:300,cumM:600,cost:[2200000, 60000, 48000, 120000, 110000, 90000, 120000, 36000, 72000],goals:['Make a profit','Get more renewals','Improve support'],
+  ex:{people:2260000,mkt:320000,tech:120000,ops:156000}},
+ {n:4,title:'Grow',exp:2960000,impl:1600000,sub:960000,mp:4230000,newT:40,cumT:100,newM:400,cumM:1000,cost:[2250000, 60000, 48000, 120000, 110000, 90000, 150000, 42000, 90000],goals:['Reach more buyers','Scale the platform','Grow monthly income'],
+  ex:{people:2310000,mkt:320000,tech:150000,ops:180000}},
+ {n:5,title:'Keep and earn',exp:1946000,impl:0,sub:1200000,mp:5400000,newT:0,cumT:100,newM:0,cumM:1000,cost:[1700000, 0, 36000, 0, 0, 0, 120000, 30000, 60000],goals:['Keep every customer','Stop paid marketing','Run lean'],
+  ex:{people:1700000,mkt:0,tech:120000,ops:126000}}
+];
+const CATS=[['Salaries & benefits','#1c7ed6'],['Sales commissions','#74c0fc'],['Office & facilities','#12b886'],['Digital marketing','#f59f00'],['Branding','#ffc078'],['Travel & field sales','#e8590c'],['Technology & cloud','#7048e8'],['General & admin','#adb5bd'],['Customer support','#e64980']];
+years.forEach(y=>{y.rev=y.impl+y.sub+y.mp;y.op=y.rev-y.exp});
+const f=n=>Math.round(n).toLocaleString('en-US');
+const M=(n,d=2)=>(n/1e6).toFixed(d);
+const Mp=(n,d=2)=>n<0?'('+M(-n,d)+')':M(n,d);
+const el=(t,a,txt='')=>`<${t} ${Object.entries(a).map(([k,v])=>`${k}="${v}"`).join(' ')}>${txt}</${t}>`;
+const T=(x,y,s,o={})=>el('text',{x,y,'font-size':o.size||13,'font-weight':o.w||700,fill:o.fill||C.ink,'text-anchor':o.a||'middle'},s);
+function axis(x0,x1,y0,y1,min,max,step,fmt){let h='';const sc=(y0-y1)/(max-min);
+  for(let v=min;v<=max+1e-6;v+=step){const y=y0-(v-min)*sc;h+=el('line',{x1:x0,x2:x1,y1:y,y2:y,stroke:v===0?C.ink:C.hair,'stroke-width':v===0?1.5:1});h+=T(x0-12,y+4,fmt(v),{a:'end',fill:C.muted,w:600,size:12});}
+  return [h,v=>y0-(v-min)*sc];}
+function donut(cx,cy,r,w,parts){let a=-Math.PI/2,h='';const tot=parts.reduce((s,p)=>s+p[0],0);
+  parts.forEach(([v,c])=>{if(!v)return;const a2=a+v/tot*Math.PI*2-0.02;const large=a2-a>Math.PI?1:0;
+   h+=el('path',{d:`M${cx+r*Math.cos(a)} ${cy+r*Math.sin(a)} A${r} ${r} 0 ${large} 1 ${cx+r*Math.cos(a2)} ${cy+r*Math.sin(a2)}`,fill:'none',stroke:c,'stroke-width':w});a=a2+0.02;});
+  return h;}
+
+// Year slides
+const slot=document.getElementById('yearSlot');
+years.forEach((y,i)=>{
+  const s=document.createElement('section');s.className='slide';s.dataset.sec=`Year ${y.n}`;
+  const col=PH[i];const mx=Math.max(y.rev,y.exp);
+  const parts=[['Implementation',y.impl,C.impl],['Subscription',y.sub,C.sub],['Marketplace',y.mp,C.mp]];
+  const H=300,sc=H/Math.max(y.rev,y.exp);
+  const stack=(items,cls)=>{let h='';items.slice().reverse().forEach(([n,v,c])=>{if(v)h+=`<div style="height:${Math.max(v*sc,2)}px;background:${c};border-top:1px solid #fff"></div>`});return `<div class="stackY" style="width:64px;height:${H}px;display:flex;flex-direction:column;justify-content:flex-end;flex:none">${h}</div>`;};
+  const list=items=>items.filter(i=>i[1]).map(([n,v,c])=>`<div style="display:grid;grid-template-columns:1fr auto;gap:12px;font-size:12.5px;font-weight:700;padding:4px 0;color:var(--ink)"><span style="color:var(--text)"><i class="dot" style="background:${c};width:8px;height:8px"></i>${n.replace('&','&amp;')}</span><span>${M(v)}M</span></div>`).join('');
+  const costItems=y.cost.map((v,k)=>[CATS[k][0],v,CATS[k][1]]);
+  const block=(title,total,color,items)=>`<div><div class="label">${title}</div><div class="big" style="font-size:40px;margin:6px 0 18px;color:${color}">${M(total)}<small>M</small></div>
+    <div style="display:flex;gap:18px;align-items:flex-end">${stack(items)}<div style="flex:1;align-self:flex-end">${list(items)}</div></div></div>`;
+  s.innerHTML=`<div class="body">
+    <div class="label" style="color:${col}">Year ${y.n}</div><h2 style="margin-top:6px">${y.title}</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 250px;gap:56px;margin-top:30px;flex:1">
+      ${block('Revenue',y.rev,C.ink,parts)}
+      ${block('Expenses',y.exp,C.ink,costItems)}
+      <div style="display:flex;flex-direction:column">
+        <div class="label">Operating ${y.op<0?'loss':'profit'}</div>
+        <div class="big ${y.op<0?'loss':'gain'}" style="font-size:40px;margin-top:6px">${y.op<0?'−':'+'}${M(Math.abs(y.op))}<small>M</small></div>
+        <div style="height:1px;background:${C.hair};margin:22px 0"></div>
+        <div class="label" style="margin-bottom:8px">Customers</div>
+        ${[['TMS',y.cumT,y.newT,C.sub],['Marketplace',y.cumM,y.newM,C.mp]].map(([n,t,d,c])=>`<div style="display:flex;align-items:baseline;justify-content:space-between;padding:6px 0"><span style="font-weight:700;font-size:14px;color:var(--text)">${n}</span><span><span class="big" style="font-size:26px;color:${c}">${f(t)}</span><span style="display:inline-block;min-width:44px;text-align:right;font-weight:800;font-size:12px;color:${d?C.gain:C.muted}">${d?'+'+f(d):'±0'}</span></span></div>`).join('')}
+        <div style="height:1px;background:${C.hair};margin:22px 0"></div>
+        <div class="label" style="margin-bottom:4px">Focus</div>
+        ${y.goals.map(g=>`<div style="font-weight:700;font-size:14px;color:var(--ink);padding:6px 0"><i class="dot" style="background:${col};width:7px;height:7px"></i>${g.replace('&','&amp;')}</div>`).join('')}
+      </div>
+    </div></div>`;
+  slot.before(s);
+});
+slot.remove();
+
+const slides=[...document.querySelectorAll('.slide')];
+slides.forEach((s,i)=>{if(!s.dataset.sec)return;
+  s.insertAdjacentHTML('afterbegin','<div style="height:56px;flex:none"></div>');
+  s.insertAdjacentHTML('beforeend',`<div class="ftr">${i+1} / ${slides.length}</div>`);});
+
+// Unit economics equation
+(()=>{const items=[['10','trips / month',C.ink],['×','',C.muted],['1,500','SAR per trip',C.ink],['×','',C.muted],['3%','commission',C.mp],['=','',C.muted],['450','SAR / month',C.mp],['→','',C.muted],['5.4M','SAR / yr at 1,000',C.gain]];
+ const xs=[60,190,320,450,580,700,830,960,1080];let h='';
+ items.forEach(([v,l,c],i)=>{const op=!l;h+=T(xs[i],60,v,{size:op?34:48,w:800,fill:c});if(l)h+=T(xs[i],98,l,{size:13,fill:C.muted,w:700});});
+ document.getElementById('eqChart').innerHTML=h;})();
+
+// Journey
+(()=>{let h='';const xs=years.map((_,i)=>110+i*229),ly=250;
+ h+=el('line',{x1:60,x2:1076,y1:ly,y2:ly,stroke:C.hair,'stroke-width':6,'stroke-linecap':'round'});
+ h+=el('line',{x1:60,x2:xs[2],y1:ly,y2:ly,stroke:C.loss,'stroke-width':6,'stroke-linecap':'round',opacity:.35});
+ h+=el('line',{x1:xs[2],x2:1076,y1:ly,y2:ly,stroke:C.gain,'stroke-width':6,'stroke-linecap':'round',opacity:.35});
+ const mx=5e6;
+ years.forEach((y,i)=>{const x=xs[i],c=PH[i],hh=Math.abs(y.op)/mx*150;
+  h+=el('rect',{x:x-34,y:y.op<0?ly+14:ly-14-hh,width:68,height:hh,rx:6,fill:y.op<0?C.loss:C.gain,opacity:.9});
+  h+=T(x,y.op<0?ly+14+hh+24:ly-14-hh-12,Mp(y.op),{size:20,w:800,fill:y.op<0?C.loss:C.gain});
+  h+=el('circle',{cx:x,cy:ly,r:11,fill:'#fff',stroke:c,'stroke-width':5});
+  const ty=y.op<0?60:410;
+  h+=T(x,ty,'YEAR '+y.n,{size:12,fill:c,w:800});
+  h+=T(x,ty+26,y.title,{size:16,w:800});
+  h+=T(x,ty+48,`${y.cumT} TMS · ${f(y.cumM)} market`,{size:12,fill:C.muted,w:600});});
+ h+=T(xs[2],ly-205,'',{});
+ document.getElementById('journey').innerHTML=h;})();
+
+// Revenue chart
+(()=>{const x0=60,x1=1100,y0=390,y1=30;const [ax,Y]=axis(x0,x1,y0,y1,0,7e6,1e6,v=>v/1e6+'M');let h=ax;
+ const sw=(x1-x0)/5,bw=110;const pts=[];
+ years.forEach((y,i)=>{const cx=x0+sw*i+sw/2,x=cx-bw/2;let base=0;
+  [[y.impl,C.impl],[y.sub,C.sub],[y.mp,C.mp]].forEach(([v,c],k,arr)=>{if(v>0){h+=el('rect',{x,y:Y(base+v),width:bw,height:Y(base)-Y(base+v)-2,fill:c,rx:k===2||(!y.mp&&k===1)?6:0});
+    if(Y(base)-Y(base+v)>28)h+=T(cx,(Y(base)+Y(base+v))/2+5,M(v,1),{fill:'#fff',size:13,w:800});}base+=v;});
+  h+=T(cx,Y(y.rev)-12,M(y.rev),{size:18,w:800});
+  h+=T(cx,y0+26,'Year '+y.n,{fill:C.text,size:14});
+  pts.push([cx,Y(y.exp)]);});
+ h+=el('polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:C.loss,'stroke-width':3,'stroke-dasharray':'7 5'});
+ pts.forEach(p=>h+=el('circle',{cx:p[0],cy:p[1],r:6,fill:'#fff',stroke:C.loss,'stroke-width':3}));
+ document.getElementById('revChart').innerHTML=h;})();
+
+// Expense chart
+(()=>{const x0=50,x1=710,y0=380,y1=30;const [ax,Y]=axis(x0,x1,y0,y1,0,3e6,1e6,v=>v/1e6+'M');let h=ax;const sw=(x1-x0)/5,bw=84;
+ years.forEach((y,i)=>{const cx=x0+sw*i+sw/2;let base=0;
+  y.cost.forEach((v,k)=>{if(v){h+=el('rect',{x:cx-bw/2,y:Y(base+v),width:bw,height:Math.max(Y(base)-Y(base+v)-1,1),fill:CATS[k][1]});
+   if(k===0)h+=T(cx,(Y(0)+Y(v))/2+5,M(v),{fill:'#fff',size:14,w:800});}base+=v;});
+  h+=T(cx,Y(y.exp)-12,M(y.exp),{size:16,w:800});h+=T(cx,y0+26,'Year '+y.n,{fill:C.text,size:14});});
+ document.getElementById('expChart').innerHTML=h;
+ const all=years.reduce((s,y)=>s+y.exp,0);
+ document.getElementById('expLegend').innerHTML=`<div style="display:grid;grid-template-columns:1fr auto auto;gap:0 16px;font-size:13px;font-weight:700;color:var(--ink)">
+  <div class="label" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">Category</div><div class="label r" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">5-yr SAR</div><div class="label r" style="padding-bottom:8px;border-bottom:2px solid var(--ink)">Share</div>
+  ${CATS.map(([n,c],k)=>{const t=years.reduce((s,y)=>s+y.cost[k],0);return `<div style="padding:7px 0;border-bottom:1px solid ${C.hair}"><i class="dot" style="background:${c};width:9px;height:9px"></i>${n.replace('&','&amp;')}</div><div class="r" style="padding:7px 0;border-bottom:1px solid ${C.hair}">${f(t)}</div><div class="r" style="padding:7px 0;border-bottom:1px solid ${C.hair};color:${c}">${(t/all*100).toFixed(1)}%</div>`}).join('')}
+  <div style="padding-top:9px;font-weight:800">Total</div><div class="r" style="padding-top:9px;font-weight:800">${f(all)}</div><div class="r" style="padding-top:9px;font-weight:800">100%</div></div>`;})();
+
+// Profit chart
+(()=>{const x0=60,x1=1100,y0=420,y1=30;const [ax,Y]=axis(x0,x1,y0,y1,-3e6,7e6,1e6,v=>v/1e6+'M');let h=ax;
+ const sw=(x1-x0)/5,bw=110;let cum=0;const pts=[];
+ years.forEach((y,i)=>{const cx=x0+sw*i+sw/2;const top=Math.max(y.op,0),bot=Math.min(y.op,0);
+  h+=el('rect',{x:cx-bw/2,y:Y(top),width:bw,height:Y(bot)-Y(top),rx:6,fill:y.op<0?C.loss:C.gain});
+  h+=T(cx,y.op<0?Y(y.op)+26:Y(y.op)-12,Mp(y.op),{size:18,w:800,fill:y.op<0?C.loss:C.gain});
+  h+=T(cx,y0+26,'Year '+y.n,{fill:C.text,size:14});
+  cum+=y.op;pts.push([cx,Y(cum),cum]);});
+ h+=el('polyline',{points:pts.map(p=>p[0]+','+p[1]).join(' '),fill:'none',stroke:C.sub,'stroke-width':3});
+ pts.forEach(p=>{h+=el('circle',{cx:p[0],cy:p[1],r:6,fill:C.sub,stroke:'#fff','stroke-width':2});h+=T(p[0]+bw/2+10,p[1]-10,Mp(p[2],1),{size:13,w:800,fill:C.sub,a:'start'});});
+ h+=T(x1-4,y1+4,'Cumulative total',{size:13,w:800,fill:C.sub,a:'end'});
+ document.getElementById('plChart').innerHTML=h;})();
+
+// Customer charts
+function cust(id,key,nk,max,step,c){const x0=50,x1=510,y0=280,y1=30;const [ax,Y]=axis(x0,x1,y0,y1,0,max,step,v=>f(v));let h=ax;const sw=(x1-x0)/5,bw=58;
+ years.forEach((y,i)=>{const cx=x0+sw*i+sw/2,prev=y[key]-y[nk];
+  if(prev)h+=el('rect',{x:cx-bw/2,y:Y(prev),width:bw,height:y0-Y(prev),fill:c,opacity:.3});
+  if(y[nk])h+=el('rect',{x:cx-bw/2,y:Y(y[key]),width:bw,height:Y(prev)-Y(y[key]),fill:c});
+  h+=T(cx,Y(y[key])-10,f(y[key]),{size:16,w:800});
+  h+=T(cx,y0+22,'Year '+y.n,{fill:C.text,size:13});
+  h+=T(cx,y0+42,y[nk]?'+'+f(y[nk]):'·',{fill:y[nk]?C.gain:C.muted,size:12,w:800});});
+ document.getElementById(id).innerHTML=h;}
+cust('tmsChart','cumT','newT',100,25,C.sub);cust('mpChart','cumM','newM',1000,250,C.mp);
+
+// Waterfall
+(()=>{const items=[['Year 1 operations',2757980,C.mp],['Year 2 operations',2832980,C.mp],['Product, IP & goodwill',800000,C.impl],['Company formation',30000,C.sub],['15% contingency',838644,'#12b886']];
+ const x0=60,x1=1100,y0=400,y1=30;const [ax,Y]=axis(x0,x1,y0,y1,0,8e6,2e6,v=>v/1e6+'M');let h=ax;const n=6,sw=(x1-x0)/n,bw=104;let run=0;
+ items.forEach(([l,v,c],i)=>{const cx=x0+sw*i+sw/2;h+=el('rect',{x:cx-bw/2,y:Y(run+v),width:bw,height:Math.max(Y(run)-Y(run+v),3),rx:4,fill:c});
+  h+=el('line',{x1:cx+bw/2,x2:cx+sw-bw/2,y1:Y(run+v),y2:Y(run+v),stroke:C.muted,'stroke-dasharray':'3 4'});
+  h+=T(cx,Y(run+v)-12,v>=1e5?M(v):'0.03',{size:17,w:800,fill:c});
+  h+=T(cx,y0+26,l.replace('&','&amp;'),{fill:C.text,size:13});run+=v;});
+ const cx=x0+sw*5+sw/2;h+=el('rect',{x:cx-bw/2,y:Y(run),width:bw,height:y0-Y(run),rx:4,fill:C.ink});
+ h+=T(cx,Y(run)-12,M(run),{size:22,w:800});h+=T(cx,y0+26,'Total',{size:14,w:800});
+ document.getElementById('wfChart').innerHTML=h;})();
+
+// Risks
+(()=>{const ic={
+ slow:'<path d="M4 20h16M6 16l4-4 3 3 5-6"/>',churn:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/>',truck:'<path d="M2 7h11v9H2zM13 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',cost:'<path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/>',mega:'<path d="M3 11v2l13 5V6L3 11zM16 9a3 3 0 0 1 0 6"/>'};
+ const r=[['slow','Slow sales','Fewer customers than planned',C.loss],['churn','Customers leave','Subscriptions get cancelled',C.impl],['truck','Fewer trips','Less commission',C.mp],
+  ['clock','Slow onboarding','Customers take longer to start',C.sub],['cost','Higher costs','Staff, tech or marketing','#12b886'],['mega','Year 5 marketing','We may still need it',C.ink]];
+ document.getElementById('risks').innerHTML=r.map(([k,t,d,c])=>`<div style="display:flex;gap:18px;align-items:flex-start"><svg viewBox="0 0 24 24" style="width:40px;height:40px;flex:none;stroke:${c};fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round">${ic[k]}</svg><div><div style="font-weight:800;font-size:19px;color:var(--ink)">${t}</div><div style="font-weight:600;font-size:14px;color:var(--muted);margin-top:4px">${d}</div></div></div>`).join('');})();
+
+// Summary
+(()=>{let te=0,tr=0;const mx=5e6;const tb=document.getElementById('sumBody');
+ const bar=v=>`<div style="display:flex;align-items:center;height:22px"><div style="flex:1;display:flex;justify-content:flex-end">${v<0?`<div style="height:16px;border-radius:4px 0 0 4px;width:${-v/mx*100}%;background:${C.loss}"></div>`:''}</div><div style="width:2px;height:22px;background:${C.ink}"></div><div style="flex:1">${v>0?`<div style="height:16px;border-radius:0 4px 4px 0;width:${v/mx*100}%;background:${C.gain}"></div>`:''}</div><div style="width:76px;text-align:right;font-weight:800;color:${v<0?C.loss:C.gain}">${Mp(v)}M</div></div>`;
+ tb.innerHTML=years.map((y,i)=>{te+=y.exp;tr+=y.rev;return `<tr><td><i class="dot" style="background:${PH[i]}"></i>Year ${y.n}</td><td class="r">${M(y.rev)}M</td><td class="r">${M(y.exp)}M</td><td>${bar(y.op)}</td><td class="r" style="color:${y.op<0?C.loss:C.gain}">${Math.round(y.op/y.rev*100)}%</td></tr>`}).join('')+
+ `<tr class="tot"><td>Total</td><td class="r">${M(tr)}M</td><td class="r">${M(te)}M</td><td style="text-align:right;color:${C.gain};font-size:18px">${M(tr-te)}M</td><td class="r gain">${Math.round((tr-te)/tr*100)}%</td></tr>`;})();
+
+// Animation timing: stagger elements in reading order
+document.querySelectorAll('#plChart rect,#journey rect').forEach(r=>{if(r.getAttribute('fill')===C.loss)r.classList.add('neg')});
+slides.forEach(sl=>{
+  sl.querySelectorAll(':is(h1,h2,.label,.big,p,.tag,table tr,#risks>div)').forEach((e,i)=>e.style.animationDelay=Math.min(i*60,900)+'ms');
+  sl.querySelectorAll('svg').forEach(svg=>{
+    svg.querySelectorAll('rect').forEach((e,i)=>e.style.animationDelay=(250+i*45)+'ms');
+    const n=svg.querySelectorAll('rect').length,end=250+n*45;
+    svg.querySelectorAll('text').forEach(e=>e.style.animationDelay=(end+150)+'ms');
+    svg.querySelectorAll('polyline,path').forEach((e,i)=>e.style.animationDelay=(svg.querySelector('rect')?end+100:250+i*90)+'ms');
+    svg.querySelectorAll('circle').forEach((e,i)=>e.style.animationDelay=(end+200+i*80)+'ms');});
+  sl.querySelectorAll('.stackY').forEach(st=>[...st.children].reverse().forEach((e,i)=>e.style.animationDelay=(300+i*60)+'ms'));
+  sl.querySelectorAll('td div[style*="height:16px"]').forEach((e,i)=>e.style.animationDelay=(400+i*90)+'ms');
+});
+
+// Navigation
+let cur=0;
+function go(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,j)=>{s.classList.toggle('active',j===cur);s.classList.remove('anim')});void slides[cur].offsetWidth;slides[cur].classList.add('anim');
+ document.getElementById('count').textContent=`${cur+1} / ${slides.length}`;document.getElementById('bar').style.width=`${(cur+1)/slides.length*100}%`;history.replaceState(null,'','#'+(cur+1));}
+function fs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.();}
+document.addEventListener('fullscreenchange',()=>{document.getElementById('fsIcon').innerHTML=document.fullscreenElement?'<path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/>':'<path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/>';fit();});
+document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}if(['ArrowLeft','PageUp'].includes(e.key))go(cur-1);if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);if(e.key==='f'||e.key==='F')fs();});
+document.getElementById('nextBtn').onclick=()=>go(cur+1);document.getElementById('prevBtn').onclick=()=>go(cur-1);document.getElementById('fsBtn').onclick=fs;
+let tx=null;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);document.addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)go(cur+(d<0?1:-1));tx=null;});
+function fit(){const pad=document.fullscreenElement?1:1.06;const s=Math.min(innerWidth/(1280*pad),innerHeight/(720*pad));document.getElementById('deck').style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>

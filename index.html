@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16182d; --text:#555b72; --muted:#9aa0b4; --line:#eef0f6;
+  --indigo:#5b5bf0; --coral:#ff6b4a; --mint:#12b886; --amber:#f7a400; --sky:#1fa2e6; --violet:#9b5de5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#eceef5;color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+.stage{position:fixed;inset:0;display:grid;place-items:center}
+.deck{width:1280px;height:720px;position:relative;transform-origin:center}
+.slide{position:absolute;inset:0;background:#fff;padding:40px 80px 50px;display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible}
+.slide::after{content:attr(data-n);position:absolute;right:80px;bottom:24px;font:600 12px Outfit;color:var(--muted)}
+h1,h2,h3{font-family:Outfit,sans-serif;color:var(--ink);font-weight:700;letter-spacing:-.02em}
+h1{font-size:72px;line-height:1.02;font-weight:800}
+h2{font-size:46px;line-height:1.1;margin-top:46px;max-width:1040px}
+h3{font-size:22px;line-height:1.2}
+p{font-size:17px;line-height:1.5}
+.sub{font-size:20px;margin-top:14px;max-width:900px}
+svg text{font-family:Outfit,sans-serif}
+.ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* chapter tracker */
+.chap{display:flex;gap:8px;font:600 13px Outfit}
+.chap span{padding:6px 14px;border-radius:99px;background:var(--line);color:var(--muted)}
+.chap span.on{background:var(--c);color:#fff}
+.chap span.done{color:var(--ink)}
+.nav{position:fixed;bottom:14px;right:20px;display:flex;align-items:center;gap:2px;z-index:5;font:600 12px Outfit;color:var(--muted)}
+.nav span{padding:0 10px}
+.nav button{background:none;border:none;width:32px;height:30px;cursor:pointer;color:var(--ink);display:grid;place-items:center;opacity:.5}
+.nav button:hover{opacity:1}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+:fullscreen .nav>:not(.vbtn){visibility:hidden}:fullscreen .nav:hover>:not(.vbtn){visibility:visible}
+/* one gentle entrance per slide, nothing loops */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+.anim .a{animation:rise .5s ease-out both}
+/* story motion: plays once each time the slide opens */
+@keyframes inL{from{transform:translateX(-600px)}}
+@keyframes inR{from{transform:translateX(600px)}}
+@keyframes draw{from{stroke-dashoffset:500}}
+@keyframes pop{0%,60%{transform:scale(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.anim .inL{animation:inL 1.6s cubic-bezier(.25,.8,.3,1) both .3s}
+.anim .inR{animation:inR 1.6s cubic-bezier(.25,.8,.3,1) both .3s}
+.anim .draw{stroke-dasharray:500;animation:draw 1.2s ease-out both 1.4s}
+.anim .pop{transform-box:fill-box;transform-origin:center;animation:pop 2.4s cubic-bezier(.3,1.5,.5,1) both}
+/* trucks drive from --from to --to; the end position is also set inline so it holds */
+@keyframes move{from{transform:translateX(var(--from))}to{transform:translateX(var(--to))}}
+.anim .mv{animation:move 2.2s cubic-bezier(.45,0,.3,1) both;animation-delay:var(--dl,.3s)}
+@keyframes loadBox{to{transform:translate(var(--bx),var(--by))}}
+.anim .loadbox{animation:loadBox .9s cubic-bezier(.4,0,.2,1) both .6s,hide .01s linear both 1.5s}
+@keyframes hide{to{opacity:0}}
+@keyframes show{from{opacity:0}}
+.anim .hidelate{animation:hide .01s linear both 1.5s}
+.anim .showlate{animation:show .01s linear both 1.5s}
+@keyframes cap{0%{opacity:0;transform:translateY(8px)}}
+.anim .cap{animation:cap .5s ease-out both;animation-delay:var(--dl,2.4s)}
+.anim .bump{transform-box:fill-box;transform-origin:center;animation:pop .7s cubic-bezier(.3,1.5,.5,1) both}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+@media print{
+  html,body{overflow:visible;background:#fff}.stage{position:static;display:block}.deck{transform:none!important;height:auto}
+  .slide{position:relative;opacity:1;visibility:visible;page-break-after:always;height:720px}.nav{display:none}
+  @page{size:1280px 720px;margin:0}
+}
+/* video popup */
+.nav .vbtn{display:flex;align-items:center;gap:7px;width:auto;height:30px;padding:0 14px 0 11px;margin-right:12px;border-radius:99px;background:var(--ink);color:#fff;font:600 12px Outfit;white-space:nowrap;opacity:.85}
+.nav .vbtn:hover{opacity:1}
+.nav .vbtn svg{width:9px;height:9px;fill:#fff;stroke:none}
+.vmodal{position:fixed;inset:0;z-index:10;display:none;place-items:center;background:rgba(22,24,45,.6)}
+.vmodal.open{display:grid}
+.vmodal video{width:min(90vw,160vh);aspect-ratio:16/9;border-radius:12px;background:#000}
+.vclose{position:absolute;top:18px;right:22px;width:36px;height:36px;border:none;border-radius:50%;background:#fff;color:var(--ink);font:600 20px Outfit;cursor:pointer}
+@media print{.vbtn,.vmodal{display:none!important}}
+.deckLink{position:fixed;bottom:14px;left:20px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;background:#fff;border:1px solid #e4e7ec;color:#16182d;font:600 12px Manrope,Outfit,system-ui,sans-serif;text-decoration:none;opacity:.75}
+.deckLink:hover{opacity:1}
+:fullscreen .deckLink{opacity:0}:fullscreen .deckLink:hover{opacity:1}
+@media print{.deckLink{display:none}}
+</style>
+</head>
+<body>
+<div class="stage"><div class="deck" id="deck">
+
+<!-- 1 Cover -->
+<section class="slide" style="justify-content:center">
+  <div class="a" style="font:700 14px Outfit;letter-spacing:.12em;color:var(--indigo)">BUSINESS PLAN · SAUDI ARABIA</div>
+  <h1 class="a" style="margin-top:20px;max-width:760px">No truck should drive home <span style="color:var(--coral)">empty.</span></h1>
+  <p class="a" style="margin-top:22px;font-size:21px;max-width:640px">Free app · Live truck data · Freight marketplace</p>
+  <svg class="a" viewBox="0 0 1120 160" style="position:absolute;left:80px;right:80px;bottom:60px;width:1120px" id="coverArt"></svg>
+</section>
+
+<!-- PROBLEM -->
+<section class="slide" data-ch="0">
+  <h2 class="a">One truck. Full load.</h2>
+  <svg class="a" viewBox="0 0 1120 300" style="width:100%;margin:auto 0" id="s1"></svg>
+</section>
+
+<section class="slide" data-ch="0">
+  <h2 class="a">Then it drives back <span style="color:var(--coral)">empty.</span></h2>
+  <svg class="a" viewBox="0 0 1120 300" style="width:100%;margin:auto 0" id="s2"></svg>
+</section>
+
+<section class="slide" data-ch="0">
+  <h2 class="a">Meanwhile, a shipper pays for <span style="color:var(--coral)">a second truck.</span></h2>
+  <svg class="a" viewBox="0 0 1120 300" style="width:100%;margin:auto 0" id="s3"></svg>
+</section>
+
+<section class="slide" data-ch="0">
+  <h2 class="a">Why? They can't <span style="color:var(--coral)">see each other.</span></h2>
+  <div id="why" style="display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:44px"></div>
+</section>
+
+<!-- SOLUTION -->
+<section class="slide" data-ch="1">
+  <h2 class="a">We connect them. <span style="color:var(--mint)">Both win.</span></h2>
+  <svg class="a" viewBox="0 0 1120 300" style="width:100%;margin:auto 0" id="s4"></svg>
+</section>
+
+<section class="slide" data-ch="1">
+  <h2 class="a">How it works: <span style="color:var(--mint)">three steps</span></h2>
+  <div id="steps" style="display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr;align-items:start;margin-top:44px"></div>
+</section>
+
+<section class="slide" data-ch="1">
+  <h2 class="a">One match, step by step</h2>
+  <div id="story" style="margin-top:44px;display:grid;grid-template-columns:repeat(5,1fr);gap:18px"></div>
+</section>
+
+<section class="slide" data-ch="1">
+  <h2 class="a">Who uses it</h2>
+  <div id="who" style="display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:36px"></div>
+</section>
+
+<!-- MONEY -->
+<section class="slide" data-ch="2">
+  <h2 class="a">The app is free. <span style="color:var(--amber)">We earn three ways.</span></h2>
+  <div id="rev" style="display:grid;grid-template-columns:repeat(3,1fr);gap:50px;margin-top:56px"></div>
+</section>
+
+<section class="slide" data-ch="2">
+  <h2 class="a">One customer, one month</h2>
+  <div id="eq" class="a" style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:90px"></div>
+  <p class="a" style="margin-top:60px;color:var(--muted)">After 10 free trips</p>
+</section>
+
+<!-- PLAN -->
+<section class="slide" data-ch="3">
+  <h2 class="a">Prove it small, <span style="color:var(--indigo)">then grow</span></h2>
+  <div id="plan" style="margin-top:44px"></div>
+</section>
+
+<section class="slide" data-ch="3">
+  <h2 class="a">Risks, and our answer</h2>
+  <div id="risks" style="margin-top:44px"></div>
+</section>
+
+<!-- Close -->
+<section class="slide" style="justify-content:center;align-items:center;text-align:center">
+  <h1 class="a" style="font-size:58px;max-width:980px">Every truck <span style="color:var(--indigo)">seen</span>, <span style="color:var(--amber)">planned</span> and <span style="color:var(--mint)">loaded</span>, both ways.</h1>
+  <p class="a" style="margin-top:24px;font-size:19px">Saudi Arabia → GCC</p>
+</section>
+
+</div></div>
+
+<a class="deckLink" href="five-year-financial-plan.html">Financial plan &rarr;</a>
+<div class="nav">
+  <button class="vbtn" id="vidBtn" aria-label="Watch the video"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg>Watch video</button>
+  <button id="prevBtn" aria-label="Previous slide"><svg viewBox="0 0 16 16"><path d="M10 3L5 8l5 5"/></svg></button>
+  <span id="count"></span>
+  <button id="nextBtn" aria-label="Next slide"><svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></button>
+  <button id="fsBtn" aria-label="Full screen" title="Full screen (F)" style="margin-left:8px"><svg viewBox="0 0 16 16"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button>
+</div>
+
+<div class="vmodal" id="vmodal">
+  <button class="vclose" id="vclose" aria-label="Close video">×</button>
+  <video id="vid" src="video/out/business-plan.mp4" controls playsinline preload="metadata"></video>
+</div>
+
+<script>
+const K={indigo:'#5b5bf0',coral:'#ff6b4a',mint:'#12b886',amber:'#f7a400',sky:'#1fa2e6',violet:'#9b5de5',ink:'#16182d',text:'#555b72',muted:'#9aa0b4',line:'#eef0f6'};
+const tint={indigo:'#ecebff',coral:'#fff0eb',mint:'#e3f8f0',amber:'#fff4d9',sky:'#e2f4fd',violet:'#f2eafd'};
+const $=id=>document.getElementById(id);
+const I={
+ doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+ pin:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+ store:'<path d="M3 9l1.5-5h15L21 9M4 9v11h16V9M3 9h18M9 20v-6h6v6"/>',
+ truck:'<path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+ eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ puzzle:'<path d="M4 7h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 0 0-4z"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ phone:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+ refresh:'<path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/>',
+ hand:'<path d="M2 12l4-4 4 2 3-2 4 1 5 3M2 12l5 5 2-1 2 2 2-1 2 1 5-5M9 10l3 3"/>',
+ box:'<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
+ check:'<path d="M5 12l5 5 9-10"/>',
+};
+const icon=(k,c,s=24,x=0,y=0)=>`<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 24 24" class="ic" style="color:${c}">${I[k]}</svg>`;
+const blob=(k,c,s=72)=>`<div style="width:${s}px;height:${s}px;background:${tint[c]};border-radius:${s*.3}px;display:grid;place-items:center">${icon(k,K[c],s*.48)}</div>`;
+const T=(x,y,s,o={})=>`<text x="${x}" y="${y}" font-size="${o.size||16}" font-weight="${o.w||600}" fill="${o.fill||K.ink}" text-anchor="${o.a||'middle'}">${s}</text>`;
+
+// Static side-view truck, ~165 wide, facing right (flip with scale(-1,1))
+function truck(c,{empty=false}={}){
+  const boxes=empty?'':`<rect x="10" y="22" width="26" height="24" rx="3" fill="#ffcf5c"/><rect x="40" y="16" width="28" height="30" rx="3" fill="#ff9b7a"/><rect x="72" y="26" width="22" height="20" rx="3" fill="#8fd6b8"/>`;
+  return `<rect x="0" y="6" width="104" height="48" rx="7" fill="${empty?'#fff':tint[c]}" stroke="${K[c]}" stroke-width="3" ${empty?'stroke-dasharray="7 6"':''}/>${boxes}
+   <path d="M108 20h30l22 22v14h-52z" fill="${K[c]}"/><path d="M116 26h18l14 14h-32z" fill="#fff" opacity=".9"/>
+   <circle cx="28" cy="60" r="11" fill="${K.ink}"/><circle cx="28" cy="60" r="4" fill="#fff"/><circle cx="134" cy="60" r="11" fill="${K.ink}"/><circle cx="134" cy="60" r="4" fill="#fff"/>`;}
+const shopBox=(x,y)=>`<g transform="translate(${x},${y})"><rect width="46" height="40" rx="4" fill="#ffcf5c"/><path d="M0 12h46M23 0v12" stroke="#e0a72a" stroke-width="2"/></g>`;
+
+// Road scene: Dammam on the left, Riyadh on the right, one road per lane (y = road surface)
+const city=(x,name)=>`<g transform="translate(${x-18},0)">${icon('pin',K.ink,36)}</g>${T(x,58,name,{size:18,w:700})}`;
+const lane=y=>`<rect x="40" y="${y}" width="1040" height="12" rx="6" fill="${K.line}"/>`;
+const drop=(x,y)=>`<line x1="${x}" y1="72" x2="${x}" y2="${y}" stroke="${K.muted}" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>`;
+function road(inner,lanes=[220]){const y=Math.max(...lanes);
+  return `${city(70,'Dammam')}${city(1050,'Riyadh')}${drop(70,y)}${drop(1050,y)}${lanes.map(lane).join('')}${inner}`;}
+// A truck that drives along a lane from x=a to x=b (flipped when heading left)
+function drive(c,a,b,roadY,opt={},dl='.3s'){const flip=b<a;
+  const body=flip?`<g transform="translate(165,0) scale(-1,1)">${truck(c,opt)}</g>`:truck(c,opt);
+  return `<g class="mv" style="--from:${a}px;--to:${b}px;--dl:${dl};transform:translateX(${b}px)"><g transform="translate(0,${roadY-72})">${body}</g></g>`;}
+const cap=(x,y,s,c,dl='2.4s')=>`<g class="cap" style="--dl:${dl}">${T(x,y,s,{size:22,w:700,fill:c})}</g>`;
+
+const L=(x,y,inner,dir='inL')=>`<g class="${dir}"><g transform="translate(${x},${y})">${inner}</g></g>`;
+// Cover: one loaded truck crossing
+$('coverArt').innerHTML=`<rect x="0" y="140" width="1120" height="10" rx="5" fill="${K.line}"/>${drive('indigo',-200,480,140)}`;
+
+// 1. Loaded truck drives Dammam → Riyadh
+$('s1').innerHTML=road(`${drive('indigo',90,830,220)}${cap(560,290,'Dammam → Riyadh · paid ✓',K.indigo)}`);
+
+// 2. Same truck, now empty, drives Riyadh → Dammam
+$('s2').innerHTML=road(`${drive('coral',830,90,220,{empty:true})}${cap(560,290,'Riyadh → Dammam · empty · SAR 0',K.coral)}`);
+
+// 3. Two trucks on the same road: our empty one, and a second one hired for the shipper
+$('s3').innerHTML=road(`
+ ${T(40,96,'Our truck: empty',{size:15,w:700,fill:K.coral,a:'start'})}${drive('coral',830,430,130,{empty:true})}
+ ${T(40,226,'Second truck: hired just for this load',{size:15,w:700,fill:K.violet,a:'start'})}${drive('violet',830,430,260,{},'.5s')}
+ ${cap(820,205,'Two trips. One was enough.',K.ink)}`,[130,260]);
+
+// 4. The shipper's load goes into our empty truck, which then drives home full
+$('s4').innerHTML=road(`
+ <g transform="translate(1000,178)" ><g class="loadbox" style="--bx:-71px;--by:-18px">${shopBox(0,0).replace('translate(0,0)','')}</g></g>
+ <g class="hidelate">${T(1023,250,'Shipper\'s load',{size:14,w:700,fill:K.amber})}</g>
+ <g class="mv" style="--from:830px;--to:90px;--dl:1.7s;transform:translateX(90px)"><g transform="translate(0,148)">
+   <g transform="translate(165,0) scale(-1,1)">${truck('mint',{empty:true})}<g class="showlate"><rect x="20" y="16" width="46" height="34" rx="4" fill="#ffcf5c"/></g></g></g></g>
+ ${cap(560,290,'Riyadh → Dammam · loaded · paid ✓',K.mint,'4s')}`);
+
+const bubble=(x,y,w,s,c)=>`<g transform="translate(${x},${y})"><rect width="${w}" height="34" rx="12" fill="#fff"/>${T(w/2,22,s,{size:13,w:700,fill:c})}</g>`;
+const whySc={
+ // GPS shows the truck, but not when it will be free
+ eye:`<rect x="20" y="140" width="260" height="8" rx="4" fill="#fff"/>
+  <g transform="translate(80,94) scale(.55)">${truck('coral')}</g>
+  ${bubble(60,24,180,'Free at ??:??',K.coral)}<path d="M150 58 L130 88" stroke="${K.coral}" stroke-width="2" stroke-dasharray="2 5"/>
+  ${T(150,180,'GPS: where, but not when',{size:13,w:600,fill:K.text})}`,
+ // trip info spread across many tools
+ scatter:`<g transform="rotate(-8 80 70)"><rect x="34" y="34" width="92" height="70" rx="8" fill="#fff"/><path d="M34 56h92M34 78h92M64 34v70M94 34v70" stroke="${tint.amber}" stroke-width="2"/></g>
+  <g transform="rotate(6 210 60)"><rect x="168" y="28" width="96" height="44" rx="14" fill="#fff"/><rect x="182" y="42" width="56" height="6" rx="3" fill="${K.amber}" opacity=".5"/><rect x="182" y="54" width="40" height="6" rx="3" fill="${tint.amber}"/></g>
+  <g transform="translate(170,96) rotate(-6)"><rect width="56" height="80" rx="10" fill="#fff"/>${icon('phone',K.amber,30,13,22)}</g>
+  <g transform="translate(64,124)"><rect width="76" height="52" rx="8" fill="#fff"/>${icon('pin',K.amber,26,8,13)}${icon('doc',K.amber,26,42,13)}</g>`,
+ // one shipper, many calls, no answer
+ calls:`<g transform="translate(26,46)"><rect width="70" height="110" rx="14" fill="#fff" stroke="${K.violet}" stroke-width="3"/><circle cx="35" cy="55" r="16" fill="${tint.violet}"/>${icon('phone',K.violet,18,26,46)}</g>
+  ${bubble(130,24,140,'Busy',K.muted)}${bubble(130,72,140,'No truck today',K.muted)}${bubble(130,120,140,'Call tomorrow',K.muted)}
+  <path d="M100 100 C 115 60, 120 50, 128 42M100 100 H128M100 100 C 115 130, 120 135, 128 138" fill="none" stroke="${K.violet}" stroke-width="2" stroke-dasharray="3 5"/>`};
+$('why').innerHTML=[['eye','coral','Nobody knows when trucks are free','Tracking shows where a truck is, not when it can take the next load.'],
+ ['scatter','amber','Trip info is scattered','It lives in spreadsheets, chats, calls and separate GPS apps.'],
+ ['calls','violet','Shippers call around','Finding one truck takes call after call.']]
+ .map(([k,c,t,d])=>`<div class="a"><svg viewBox="0 0 300 200" class="bump" style="width:100%;background:${tint[c]};border-radius:24px">${whySc[k]}</svg>
+  <h3 style="margin-top:22px;font-size:23px">${t}</h3><p style="margin-top:8px;font-size:15.5px">${d}</p></div>`).join('');
+
+const arrow=`<svg viewBox="0 0 60 84" class="a"><path d="M10 42h36M36 32l10 10-10 10" fill="none" stroke="${K.muted}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// Each step gets a small scene that shows what happens in it
+const sc={
+ // phone with a waybill, sending GPS from the truck
+ app:`<rect x="40" y="20" width="96" height="160" rx="16" fill="#fff" stroke="${K.mint}" stroke-width="3"/>
+  <rect x="56" y="44" width="64" height="8" rx="4" fill="${K.mint}"/><rect x="56" y="64" width="48" height="6" rx="3" fill="${tint.mint}"/><rect x="56" y="78" width="56" height="6" rx="3" fill="${tint.mint}"/><rect x="56" y="92" width="40" height="6" rx="3" fill="${tint.mint}"/>
+  <rect x="56" y="140" width="64" height="22" rx="11" fill="${K.mint}"/>${T(88,156,'Waybill',{size:12,w:700,fill:'#fff'})}
+  <g transform="translate(160,104) scale(.6)">${truck('mint')}</g>
+  <g transform="translate(212,60)">${icon('pin',K.mint,30,-15,-15)}<path d="M-22 -24a30 30 0 0 1 44 0M-32 -34a44 44 0 0 1 64 0" fill="none" stroke="${K.mint}" stroke-width="2.5" stroke-linecap="round"/></g>`,
+ // truck on a route with a "free at" badge where it ends
+ predict:`<rect x="20" y="132" width="260" height="8" rx="4" fill="#fff"/>
+  <rect x="20" y="132" width="150" height="8" rx="4" fill="${K.indigo}"/>
+  <g transform="translate(92,86) scale(.5)">${truck('indigo')}</g>
+  <g transform="translate(250,136)"><circle r="9" fill="#fff" stroke="${K.indigo}" stroke-width="3"/></g>
+  ${T(250,170,'Riyadh',{size:13,w:700})}
+  <g transform="translate(170,26)"><rect width="116" height="44" rx="12" fill="#fff"/>${icon('clock',K.indigo,22,12,11)}${T(42,28,'Free 14:30',{size:15,w:700,fill:K.indigo,a:'start'})}</g>
+  <path d="M240 72 L250 120" stroke="${K.indigo}" stroke-width="2" stroke-dasharray="2 5"/>`,
+ // shipper's box matched to the truck
+ match:`<g transform="translate(36,78)"><rect width="64" height="56" rx="6" fill="#ffcf5c"/><path d="M0 16h64M32 0v16" stroke="#e0a72a" stroke-width="2.5"/></g>
+  ${T(68,160,'Load',{size:13,w:700})}
+  <g transform="translate(176,82) scale(.55)">${truck('coral',{empty:true})}</g>
+  ${T(222,160,'Empty truck',{size:13,w:700})}
+  <path d="M106 106 H170" stroke="${K.coral}" stroke-width="3" stroke-dasharray="4 6"/>
+  <g transform="translate(138,106)"><circle r="16" fill="${K.coral}"/>${icon('check','#fff',18,-9,-9)}</g>`};
+$('steps').innerHTML=[['app','mint','Transporters use our free app','They make waybills and connect GPS. Now we see every trip.'],
+ ['predict','indigo','AI predicts when a truck is free','From GPS and past trips: where it will finish, and when.'],
+ ['match','coral','We match it with a load','Shippers post goods. The transporter accepts in one tap.']]
+ .map(([k,c,t,d],i)=>`<div class="a"><svg viewBox="0 0 300 200" class="bump" style="width:100%;background:${tint[c]};border-radius:24px">${sc[k]}</svg>
+  <div style="font:700 13px Outfit;color:${K[c]};letter-spacing:.08em;margin-top:22px">STEP ${i+1}</div><h3 style="margin-top:6px;font-size:23px">${t}</h3><p style="margin-top:8px;font-size:15.5px">${d}</p></div>`).join(arrow.replace('viewBox="0 0 60 84"','viewBox="0 0 60 84" style="margin-top:70px"'));
+
+// small reusable scene pieces
+const pinAt=(x,y,c,label)=>`<g transform="translate(${x-12},${y-24})">${icon('pin',c,24)}</g>${label?T(x,y+16,label,{size:12,w:700}):''}`;
+const coin=(x,y,s,c=K.amber)=>`<g transform="translate(${x},${y})"><circle r="22" fill="${c}"/><circle r="16" fill="none" stroke="#fff" stroke-width="2" opacity=".6"/>${T(0,5,s,{size:13,w:800,fill:'#fff'})}</g>`;
+const phoneCard=(inner,c)=>`<rect x="70" y="16" width="80" height="138" rx="14" fill="#fff" stroke="${c}" stroke-width="3"/>${inner}`;
+const card=(svg,c,top,title,text)=>`<div class="a"><svg viewBox="0 0 220 170" class="bump" style="width:100%;background:${tint[c]};border-radius:20px">${svg}</svg>
+  <div style="font:700 13px Outfit;color:${K[c]};letter-spacing:.08em;margin-top:16px">${top}</div><h3 style="margin-top:4px;font-size:19px">${title}</h3>${text?`<p style="margin-top:6px;font-size:14px">${text}</p>`:''}</div>`;
+
+// Slide: one match, step by step
+const road2=y=>`<rect x="16" y="${y}" width="188" height="6" rx="3" fill="#fff"/>`;
+$('story').innerHTML=[
+ [`${road2(120)}${pinAt(30,104,K.indigo,'')}<g transform="translate(48,74) scale(.45)">${truck('indigo')}</g>${T(110,150,'Dammam → Riyadh',{size:12,w:700})}`,'indigo','08:00','Truck leaves full'],
+ [`${road2(120)}<g transform="translate(40,74) scale(.45)">${truck('sky')}</g><g transform="translate(96,22)"><rect width="104" height="34" rx="10" fill="#fff"/>${icon('clock',K.sky,18,10,8)}${T(34,22,'Free 14:30',{size:13,w:700,fill:K.sky,a:'start'})}</g>`,'sky','10:30','AI: free in Riyadh at 14:30'],
+ [phoneCard(`<rect x="84" y="40" width="52" height="40" rx="5" fill="#ffcf5c"/><path d="M84 52h52M110 40v12" stroke="#e0a72a" stroke-width="2"/>${T(110,104,'New load',{size:12,w:700})}${T(110,122,'To Dammam',{size:11,w:600,fill:K.muted})}`,K.amber),'amber','11:00','Shipper posts a load'],
+ [phoneCard(`${T(110,58,'Load match',{size:12,w:700})}<rect x="82" y="72" width="56" height="10" rx="5" fill="${tint.mint}"/><rect x="82" y="112" width="56" height="26" rx="13" fill="${K.mint}"/>${T(110,130,'Accept',{size:12,w:700,fill:'#fff'})}`,K.mint)+`<g transform="translate(160,40)"><circle r="16" fill="${K.mint}"/>${icon('check','#fff',18,-9,-9)}</g>`,'mint','11:15','Transporter accepts'],
+ [`${road2(120)}<g transform="translate(30,74) scale(.45)"><g transform="translate(165,0) scale(-1,1)">${truck('violet')}</g></g>${coin(170,50,'3%',K.violet)}`,'violet','DONE','Delivered. We earn 3%']]
+ .map(([svg,c,top,t])=>card(svg,c,top,t)).join('');
+
+// Slide: who uses it
+I.tag='<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>';
+const whoSc={
+ transporter:`<rect x="20" y="96" width="320" height="8" rx="4" fill="#fff"/><rect x="20" y="186" width="320" height="8" rx="4" fill="#fff"/>
+  <g transform="translate(60,44) scale(.5)">${truck('mint')}</g><path d="M160 70h40M190 62l10 8-10 8" fill="none" stroke="${K.mint}" stroke-width="3" stroke-linecap="round"/>
+  <g transform="translate(200,134) scale(.5)"><g transform="translate(165,0) scale(-1,1)">${truck('mint')}</g></g><path d="M190 160h-40M160 152l-10 8 10 8" fill="none" stroke="${K.mint}" stroke-width="3" stroke-linecap="round"/>
+  ${coin(300,60,'SAR',K.mint)}${coin(70,150,'SAR',K.mint)}`,
+ shipper:`<g transform="translate(40,70)"><rect width="70" height="60" rx="6" fill="#ffcf5c"/><path d="M0 18h70M35 0v18" stroke="#e0a72a" stroke-width="2.5"/></g>
+  <path d="M120 100 H170" stroke="${K.coral}" stroke-width="3" stroke-dasharray="4 6"/>
+  <g transform="translate(180,74) scale(.55)">${truck('coral')}</g>
+  <g transform="translate(214,150)"><rect width="120" height="34" rx="17" fill="#fff"/>${icon('tag',K.coral,18,12,8)}${T(36,22,'Lower price',{size:13,w:700,fill:K.coral,a:'start'})}</g>
+  <g transform="translate(30,150)"><rect width="172" height="34" rx="17" fill="#fff"/>${icon('phone',K.coral,18,12,8)}${T(36,22,'No calling around',{size:13,w:700,fill:K.coral,a:'start'})}</g>`};
+$('who').innerHTML=[['transporter','mint','Transporters','Owners and fleets. They earn on the trip back, too.'],
+ ['shipper','coral','Shippers','Factories, traders, shops. They pay less and find trucks fast.']]
+ .map(([k,c,t,d])=>`<div class="a"><svg viewBox="0 0 360 210" class="bump" style="width:100%;background:${tint[c]};border-radius:24px">${whoSc[k]}</svg>
+  <h3 style="margin-top:20px;font-size:26px">${t}</h3><p style="margin-top:6px">${d}</p></div>`).join('');
+
+$('rev').innerHTML=[['doc','mint','40K','SAR setup'],
+ ['refresh','indigo','1,000','SAR / month'],
+ ['hand','coral','3%','per trip']]
+ .map(([k,c,v,u])=>`<div class="a" style="text-align:center"><div class="bump" style="display:inline-block">${blob(k,c,84)}</div><div style="font:800 64px Outfit;color:${K[c]};margin-top:24px;letter-spacing:-.02em" data-count="${v}">${v}</div><div style="font:700 18px Outfit;color:var(--muted);margin-top:4px">${u}</div></div>`).join('');
+
+$('eq').innerHTML=[['10','trips a month',K.ink],['×','',K.muted],['SAR 1,500','per trip',K.ink],['×','',K.muted],['3%','our commission',K.coral],['=','',K.muted],['SAR 450','a month for us',K.mint]]
+ .map(([v,l,c])=>`<div style="text-align:center" class="a"><div style="font:800 ${l?58:44}px Outfit;color:${c};letter-spacing:-.02em;line-height:1">${v}</div>${l?`<div style="font:600 15px Outfit;color:${K.muted};margin-top:12px">${l}</div>`:'<div style="height:30px"></div>'}</div>`).join('');
+
+$('plan').innerHTML=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px">${[
+ [`${road2(120)}<g transform="translate(20,96) scale(.32)">${truck('mint')}</g><g transform="translate(80,96) scale(.32)">${truck('mint')}</g><g transform="translate(140,96) scale(.32)">${truck('mint')}</g>${pinAt(40,60,K.mint)}${pinAt(180,60,K.mint)}<path d="M40 50 Q110 10 180 50" fill="none" stroke="${K.mint}" stroke-width="2" stroke-dasharray="3 5"/>`,'mint','STEP 1','Get trucks on board','Free app on a few busy routes'],
+ [`<g transform="translate(26,56)">${[0,1,2].map(i=>`<g transform="translate(${i*58},${i%2?14:0})"><rect width="50" height="44" rx="5" fill="#ffcf5c"/><path d="M0 14h50M25 0v14" stroke="#e0a72a" stroke-width="2"/></g>`).join('')}</g>${T(110,140,'Weekly shippers',{size:13,w:700,fill:K.sky})}`,'sky','STEP 2','Bring in shippers','Companies that ship every week'],
+ [`${[0,1,2,3].map(i=>`<g transform="translate(${36+i*44},70)"><circle r="16" fill="${i<3?K.amber:'#fff'}"/>${i<3?icon('check','#fff',16,-8,-8):''}</g>`).join('')}${T(110,124,'Completed return trips',{size:13,w:700,fill:K.amber})}`,'amber','STEP 3','Prove it works','Count real, completed matches'],
+ [`${coin(70,80,'1K',K.indigo)}${coin(110,64,'3%',K.coral)}${coin(150,80,'40K',K.mint)}${T(110,136,'Subscriptions + commission',{size:12,w:700,fill:K.coral})}`,'coral','STEP 4','Start earning','Once matching is proven'],
+ [`${pinAt(60,70,K.violet,'KSA')}${pinAt(120,50,K.violet,'UAE')}${pinAt(170,90,K.violet,'Qatar')}${pinAt(100,120,K.violet,'Oman')}`,'violet','STEP 5','Expand','More routes, then the GCC']]
+ .map(([svg,c,top,t,d])=>card(svg,c,top,t,d)).join('')}</div>`;
+
+$('risks').innerHTML=[['Too few trucks','Start on busy routes'],
+ ['Too few loads','Target weekly shippers'],
+ ['Wrong prediction','Transporter always confirms'],
+ ['Bad GPS data','Back it with waybills'],
+ ['Privacy','Data only with permission']]
+ .map(([r,m])=>`<div class="a" style="display:grid;grid-template-columns:1fr 40px 1.3fr;align-items:center;padding:16px 0;border-bottom:1px solid ${K.line}">
+  <div style="font:700 19px Outfit;color:var(--ink)">${r}</div><div>${icon('check',K.mint,22)}</div><div style="font-size:17px">${m}</div></div>`).join('');
+
+// chapter tracker on story slides
+const CH=[['Problem',K.coral],['Solution',K.mint],['Money',K.amber],['Plan',K.indigo]];
+const slides=[...document.querySelectorAll('.slide')];
+slides.forEach((s,i)=>{
+  if(s.dataset.ch){const c=+s.dataset.ch;
+    }
+  if(i)s.dataset.n=(i+1)+' / '+slides.length;
+  s.querySelectorAll('.a').forEach((e,k)=>e.style.animationDelay=Math.min(k*90,700)+'ms');});
+
+// navigation
+let cur=0;
+function go(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,j)=>{s.classList.toggle('active',j===cur);s.classList.remove('anim')});void slides[cur].offsetWidth;slides[cur].classList.add('anim');
+ $('count').textContent=`${cur+1} / ${slides.length}`;history.replaceState(null,'','#'+(cur+1));}
+function fs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.();}
+document.addEventListener('fullscreenchange',fit);
+function openVid(){$('vmodal').classList.add('open');$('vid').play();}
+function closeVid(){$('vid').pause();$('vmodal').classList.remove('open');}
+$('vidBtn').onclick=openVid;$('vclose').onclick=closeVid;
+$('vmodal').onclick=e=>{if(e.target===$('vmodal'))closeVid();};
+document.addEventListener('keydown',e=>{if($('vmodal').classList.contains('open')){if(e.key==='Escape')closeVid();return;}if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}if(['ArrowLeft','PageUp'].includes(e.key))go(cur-1);if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);if(e.key==='f'||e.key==='F')fs();});
+$('nextBtn').onclick=()=>go(cur+1);$('prevBtn').onclick=()=>go(cur-1);$('fsBtn').onclick=fs;
+let tx=null;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);document.addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)go(cur+(d<0?1:-1));tx=null;});
+function fit(){const pad=document.fullscreenElement?1:1.06;const s=Math.min(innerWidth/(1280*pad),innerHeight/(720*pad));$('deck').style.transform=`scale(${s})`;}
+addEventListener('resize',fit);fit();
+go((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
